@@ -3,142 +3,139 @@ from datetime import datetime
 
 # 1. Configuração da Página
 st.set_page_config(
-    page_title="Doce Maju - Bolos & Doces", 
+    page_title="Doce Maju - Cardápio Online", 
     page_icon="🧁", 
-    layout="centered",
+    layout="wide", # Usamos wide para ter os dois lados (esquerda e direita)
     initial_sidebar_state="collapsed"
 )
 
-# 2. Estilo Visual baseado no seu Logo (Lilás, Rosa e Marrom)
+# 2. Estilo Visual (Baseado no seu Logo: Rosa, Lilás e Marrom)
 st.markdown("""
     <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
-    /* Fundo Pérola para destacar o logo */
     .stApp { background-color: #fdfafb; }
     
-    /* Cores do Logo */
-    h1 { color: #d4a5b9 !important; font-family: 'Brush Script MT', cursive; font-size: 50px !important; text-align: center; margin-bottom: 0px;}
-    h2, h3 { color: #5d4037 !important; font-family: 'Segoe UI', sans-serif; text-align: center;}
-    
-    .subtitulo {
-        text-align: center;
-        color: #5d4037;
+    /* Estilo dos Títulos */
+    .titulo-maju {
+        color: #d4a5b9; 
+        font-family: 'Times New Roman', serif; 
+        font-size: 40px; 
         font-weight: bold;
+        margin-bottom: 0px;
+    }
+    .subtitulo {
+        color: #5d4037;
+        font-size: 14px;
         letter-spacing: 2px;
-        margin-top: -20px;
         margin-bottom: 20px;
     }
 
-    /* Card de Produto */
+    /* Card de Produto (Lado Esquerdo) */
     .produto-card {
         background-color: white;
-        padding: 20px;
-        border-radius: 20px;
-        border: 2px solid #f3e5f5; /* Lilás bem clarinho como a batedeira */
-        box-shadow: 0px 4px 15px rgba(212, 165, 185, 0.2);
-        margin-bottom: 20px;
+        padding: 15px;
+        border-radius: 12px;
+        border-left: 5px solid #d4a5b9;
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.02);
+        margin-bottom: 10px;
     }
 
-    /* Botão Rosa do Logo */
+    /* Coluna do Pedido (Lado Direito) */
+    .coluna-pedido {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 15px;
+        border: 1px solid #fce4ec;
+        position: sticky;
+        top: 10px;
+    }
+
+    /* Botão Finalizar */
     .stButton>button {
-        background-color: #d4a5b9 !important; /* Rosa queimado do logo */
+        background-color: #d4a5b9 !important;
         color: white !important;
-        border-radius: 25px !important;
+        border-radius: 10px !important;
         border: none !important;
         width: 100%;
         font-weight: bold;
-        height: 45px;
-        transition: 0.3s;
-    }
-    
-    .stButton>button:hover {
-        background-color: #c48da4 !important;
-        transform: scale(1.02);
+        height: 50px;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Cabeçalho Personalizado (O SEU LOGO)
-col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
-with col_logo2:
-    # Quando você tiver o link da sua foto, troque o link abaixo:
-    st.image("https://cdn-icons-png.flaticon.com/512/9041/9041922.png", width=150) 
-    st.markdown("<h1>Doce Maju</h1>", unsafe_allow_html=True)
-    st.markdown("<p class='subtitulo'>BOLOS & DOCES</p>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align:center; color:#d4a5b9;'>💕 Feito com amor 💕</p>", unsafe_allow_html=True)
-
-# 4. Dados (Cardápio)
-if 'pedidos_recebidos' not in st.session_state:
-    st.session_state.pedidos_recebidos = []
-
+# 3. Dados dos Doces
 if 'estoque' not in st.session_state:
     st.session_state.estoque = {
-        "Bombom de Uva": {"preco": 11.0, "status": True, "desc": "Uva com creme de Ninho"},
-        "Bombom de Morango": {"preco": 11.0, "status": True, "desc": "Morango com creme de Ninho"},
-        "Bolo de Brigadeiro": {"preco": 7.5, "status": True, "desc": "Massa fofinha e brigadeiro artesanal"},
-        "Bolo de Morango": {"preco": 7.5, "status": True, "desc": "O clássico com frutas frescas"},
-        "Chocolate com Morango": {"preco": 7.5, "status": True, "desc": "Combinação perfeita"}
+        "Bombom de Uva": 11.0,
+        "Bombom de Morango": 11.0,
+        "Bolo de Brigadeiro": 7.5,
+        "Bolo de Brigadeiro com Morango": 7.5,
+        "Chocolate com Morango": 7.5
     }
 
-# --- ABAS ---
-tab_loja, tab_maju = st.tabs(["🧁 Cardápio", "🔐 Painel Maju"])
+# --- LAYOUT EM DUAS COLUNAS ---
+col_cardapio, col_finalizar = st.columns([1.5, 1]) # Lado esquerdo maior que o direito
 
-with tab_loja:
-    carrinho = {}
-    st.write("---")
+# --- LADO ESQUERDO: CARDÁPIO ---
+with col_cardapio:
+    st.markdown('<p class="titulo-maju">Doce Maju</p>', unsafe_allow_html=True)
+    st.markdown('<p class="subtitulo">BOLOS & DOCES</p>', unsafe_allow_html=True)
+    st.write("### 🍰 Escolha suas delícias:")
     
-    for nome, dados in st.session_state.estoque.items():
-        st.markdown('<div class="produto-card">', unsafe_allow_html=True)
-        c1, c2 = st.columns([1, 2])
-        with c1:
-            st.image("https://cdn-icons-png.flaticon.com/512/2553/2553642.png", width=80)
-        with c2:
-            st.markdown(f"**{nome}**")
-            st.caption(dados["desc"])
-            st.markdown(f"<span style='color:#d4a5b9; font-weight:bold;'>R$ {dados['preco']:.2f}</span>", unsafe_allow_html=True)
-            
-            if dados["status"]:
-                qtd = st.number_input(f"Qtd", min_value=0, max_value=20, key=f"cli_{nome}")
-                if qtd > 0:
-                    carrinho[nome] = {"qtd": qtd, "subtotal": qtd * dados["preco"]}
-            else:
-                st.error("Esgotado")
-        st.markdown('</div>', unsafe_allow_html=True)
+    carrinho = {}
+    
+    for nome, preco in st.session_state.estoque.items():
+        st.markdown(f'''
+            <div class="produto-card">
+                <span style="color:#5d4037; font-weight:bold;">{nome}</span><br>
+                <span style="color:#d4a5b9;">R$ {preco:.2f}</span>
+            </div>
+        ''', unsafe_allow_html=True)
+        
+        # Seletor de quantidade logo abaixo do card
+        qtd = st.number_input(f"Qtd {nome}", min_value=0, max_value=20, key=f"v_{nome}")
+        if qtd > 0:
+            carrinho[nome] = {"qtd": qtd, "total": qtd * preco}
+        st.write("")
 
-    if carrinho:
-        st.subheader("🛵 Dados para Entrega")
-        nome_cli = st.text_input("Seu Nome")
-        end_cli = st.text_input("Endereço Completo")
-        pag_cli = st.selectbox("Pagamento", ["Pix", "Dinheiro", "Cartão"])
+# --- LADO DIREITO: FINALIZAR PEDIDO (O "CARRINHO") ---
+with col_finalizar:
+    st.markdown('<div class="coluna-pedido">', unsafe_allow_html=True)
+    st.markdown("### 🛒 Seu Pedido")
+    
+    if not carrinho:
+        st.info("Seu carrinho está vazio. Selecione os doces ao lado! ✨")
+    else:
+        # Lista o que a pessoa escolheu
+        total_produtos = 0
+        for item, info in carrinho.items():
+            st.write(f"**{info['qtd']}x** {item} - R$ {info['total']:.2f}")
+            total_produtos += info['total']
         
-        total = sum(i['subtotal'] for i in carrinho.values()) + 3.0
-        st.markdown(f"### Total: R$ {total:.2f}")
+        st.divider()
         
-        if st.button("CONFIRMAR PEDIDO"):
-            if nome_cli and end_cli:
-                st.session_state.pedidos_recebidos.append({
-                    "id": len(st.session_state.pedidos_recebidos)+1,
-                    "cliente": nome_cli, "end": end_cli, "itens": carrinho.copy(),
-                    "total": total, "pag": pag_cli, "status": "Novo",
-                    "hora": datetime.now().strftime("%H:%M")
-                })
-                st.success("Pedido enviado! Prepare o coração para o doce!")
+        # Campos de Informação
+        st.markdown("**📍 Dados para Entrega:**")
+        nome_cliente = st.text_input("Seu Nome")
+        endereco = st.text_input("Endereço (Rua, Nº, Bairro)")
+        forma_pagamento = st.selectbox("Como deseja pagar?", ["Pix", "Dinheiro", "Cartão (Levar maquininha)"])
+        
+        taxa_entrega = 3.0
+        total_geral = total_produtos + taxa_entrega
+        
+        st.markdown(f"**Produtos:** R$ {total_produtos:.2f}")
+        st.markdown(f"**Entrega:** R$ {taxa_entrega:.2f}")
+        st.markdown(f"## **Total: R$ {total_geral:.2f}**")
+        
+        if st.button("🚀 CONFIRMAR PEDIDO AGORA"):
+            if nome_cliente and endereco:
+                # Aqui você pode adicionar a lógica de salvar o pedido
+                st.success(f"Prontinho, {nome_cliente}! Seu pedido foi enviado para a Maju.")
                 st.balloons()
-
-with tab_maju:
-    senha = st.text_input("Senha", type="password")
-    if senha == "maju123":
-        if not st.session_state.pedidos_recebidos:
-            st.info("Aguardando o primeiro pedido de hoje...")
-        else:
-            for p in reversed(st.session_state.pedidos_recebidos):
-                with st.expander(f"Pedido #{p['id']} - {p['cliente']}"):
-                    st.write(f"🏠 {p['end']} | 💰 {p['pag']}")
-                    for item, info in p['itens'].items():
-                        st.write(f"- {info['qtd']}x {item}")
-                    if st.button(f"Entregue #{p['id']}"):
-                        p['status'] = "OK"
-                        st.rerun()
+            else:
+                st.error("Ops! Preencha seu nome e endereço para pedirmos.")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
