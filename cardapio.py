@@ -1,106 +1,139 @@
 import streamlit as st
 
-# 1. Configuração e "Modo Claro" Forçado
+# 1. Configuração da Página
 st.set_page_config(page_title="Doce Maju", page_icon="🧁", layout="wide")
 
+# 2. MÁGICA DO DESIGN (CSS para copiar a foto)
 st.markdown("""
     <style>
-    /* Força o fundo branco e tira o preto do Dark Mode */
-    .stApp { background-color: #ffffff !important; color: #5d4037 !important; }
-    
-    /* Títulos com a cor do logo */
-    h1, h2, h3 { color: #d4a5b9 !important; font-family: 'Segoe UI', sans-serif; }
+    /* Fundo degradê igual da foto */
+    .stApp {
+        background: linear-gradient(135deg, #ffafbd 0%, #c9ffbf 100%); /* Um degradê suave */
+        background-image: linear-gradient(to right, #f8a5c2, #cd84f1) !important;
+    }
 
-    /* Deixando os campos de texto brancos e delicados */
-    input { background-color: #ffffff !important; border: 1px solid #fce4ec !important; color: #5d4037 !important; border-radius: 10px !important; }
-    
-    /* BOTÕES PEQUENOS E REDONDOS (Estilo iFood) */
+    /* Esconder o que não precisa */
+    header, footer {visibility: hidden;}
+
+    /* Título Doce Maju com a fonte bonitinha */
+    .titulo-topo {
+        color: white;
+        font-family: 'Brush Script MT', cursive;
+        font-size: 60px;
+        text-align: center;
+        text-shadow: 2px 2px #d4a5b9;
+        margin-bottom: 0px;
+    }
+
+    /* Estilo do Cardápio (Lado Esquerdo Rosa) */
+    .cardapio-container {
+        background-color: rgba(255, 105, 180, 0.8);
+        padding: 20px;
+        border-radius: 30px;
+        border: 3px dashed white;
+        color: white;
+    }
+
+    /* Estilo do Carrinho (Lado Direito Roxo/Branco) */
+    .carrinho-container {
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 30px;
+        box-shadow: 0px 10px 30px rgba(0,0,0,0.1);
+        color: #5d4037;
+    }
+
+    /* Botão "Finalizar" igual da foto (Rosa com brilho) */
     div.stButton > button {
-        background-color: #d4a5b9 !important;
+        background: linear-gradient(to bottom, #ff4d94, #ff0066) !important;
         color: white !important;
-        border-radius: 20px !important;
-        border: none !important;
-        padding: 5px 15px !important;
-        font-size: 14px !important;
-        height: auto !important;
-        width: auto !important; /* Não ocupa a tela toda */
-        transition: 0.3s;
+        border-radius: 30px !important;
+        border: 2px solid white !important;
+        font-weight: bold !important;
+        font-size: 20px !important;
+        height: 50px !important;
+        width: 100% !important;
+        box-shadow: 0px 5px 15px rgba(255, 0, 102, 0.4) !important;
     }
 
-    /* Card dos Doces - Clean e com vida */
-    .doce-card {
-        background: #fff;
-        padding: 15px;
+    /* Cards dos Doces Individuais */
+    .doce-item {
+        background: white;
         border-radius: 15px;
-        border: 1px solid #fce4ec;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        padding: 10px;
         margin-bottom: 10px;
+        color: #5d4037;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #fce4ec;
     }
-    
-    /* Esconde o menu de cima do Streamlit */
-    header {visibility: hidden;}
-    footer {visibility: hidden;}
     </style>
     """, unsafe_allow_html=True)
 
-# --- CABEÇALHO ---
-col1, col2, col3 = st.columns([1, 2, 1])
-with col2:
-    st.markdown("<h1 style='text-align: center;'>🧁 Doce Maju</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #5d4037;'>BOLOS & DOCES | Feito com amor</p>", unsafe_allow_html=True)
+# --- TOPO ---
+st.markdown('<p class="titulo-topo">Doce Maju</p>', unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; color:white; font-size:20px;'>🧁 Bolos & Bombons de Pote 🧁</p>", unsafe_allow_html=True)
 
-st.write("---")
-
-# --- CONTEÚDO EM DUAS COLUNAS ---
-col_cardapio, col_pedido = st.columns([1.5, 1])
-
-with col_cardapio:
-    st.subheader("🌸 Cardápio do Dia")
-    
-    doces = {
-        "Bombom de Uva": 11.0,
-        "Bombom de Morango": 11.0,
-        "Bolo de Brigadeiro": 7.5,
-        "Chocolate com Morango": 7.5
+# --- BANCO DE DADOS ---
+cardapio = {
+    "Bolos de Pote": {
+        "Brigadeiro": 8.0,
+        "Prestigio": 8.0,
+        "Morango c/ Ninho": 8.0,
+        "Oreo & Nutella": 8.0
+    },
+    "Bombons de Pote": {
+        "Ferrero Rocher": 10.0,
+        "Sonho de Valsa": 10.0,
+        "Ouro Branco": 10.0,
+        "Beijinho": 10.0
     }
-    
-    carrinho = {}
-    
-    for doce, preco in doces.items():
-        st.markdown(f"""
-            <div class="doce-card">
-                <b>{doce}</b><br>
-                <span style="color: #d4a5b9;">R$ {preco:.2f}</span>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        # Seletor pequeno de quantidade
-        qtd = st.number_input(f"Qtd {doce}", min_value=0, max_value=10, key=doce, label_visibility="collapsed")
-        if qtd > 0:
-            carrinho[doce] = {"qtd": qtd, "subtotal": qtd * preco}
+}
 
-with col_pedido:
-    st.subheader("🛒 Meu Carrinho")
+# --- LAYOUT ---
+col1, col_espaço, col2 = st.columns([1.2, 0.1, 1])
+
+with col1:
+    st.markdown('<div class="cardapio-container">', unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align:center; color:white;'>❤ Cardápio ❤</h2>", unsafe_allow_html=True)
     
-    if not carrinho:
-        st.write("Selecione um doce ao lado! ✨")
+    escolhidos = {}
+    
+    for categoria, itens in cardapio.items():
+        st.markdown(f"### ✨ {categoria}")
+        for nome, preco in itens.items():
+            # Criando o seletor de quantidade
+            qtd = st.number_input(f"{nome} (R$ {preco:.2f})", min_value=0, max_value=20, key=nome)
+            if qtd > 0:
+                escolhidos[nome] = {"qtd": qtd, "preco": preco, "sub": qtd * preco}
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
+with col2:
+    st.markdown('<div class="carrinho-container">', unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align:center;'>🛒 Meu Pedido</h2>", unsafe_allow_html=True)
+    
+    if not escolhidos:
+        st.write("Seu carrinho está vazio... por enquanto! 😉")
     else:
         total = 0
-        for item, info in carrinho.items():
-            st.write(f"✅ {info['qtd']}x {item}")
-            total += info['subtotal']
+        for nome, info in escolhidos.items():
+            st.markdown(f"💗 **{info['qtd']}x** {nome} --- R$ {info['sub']:.2f}")
+            total += info['sub']
         
-        st.write("---")
-        st.write(f"**Total: R$ {total + 3.0:.2f}** (com entrega)")
+        st.divider()
+        st.markdown(f"### **Total: R$ {total:.2f}**")
         
-        # Campos de texto brancos (sem o preto do vídeo)
-        nome = st.text_input("Seu Nome", placeholder="Como te chamamos?")
-        endereco = st.text_input("Endereço", placeholder="Rua, número e bairro")
-        pagamento = st.selectbox("Pagamento", ["Pix", "Dinheiro", "Cartão"])
+        st.markdown("---")
+        st.markdown("### 💳 Pagamento")
+        pag = st.radio("Escolha a forma:", ["Pix", "Dinheiro", "Cartão de Crédito", "Cartão de Débito"], horizontal=True)
         
-        if st.button("Finalizar Pedido"):
-            if nome and endereco:
-                st.success("Pedido enviado! 💖")
-                st.balloons()
-            else:
-                st.error("Preencha os dados de entrega!")
+        st.text_input("Seu Nome")
+        st.text_input("Endereço de Entrega")
+        
+        if st.button("💖 Finalizar Compra 💖"):
+            st.balloons()
+            st.success("Pedido enviado via WhatsApp!")
+            
+    st.markdown('</div>', unsafe_allow_html=True)
