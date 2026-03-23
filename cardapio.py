@@ -1,104 +1,144 @@
 import streamlit as st
+from datetime import datetime
 
 # 1. Configuração da Página
-st.set_page_config(page_title="Doce Maju - Cardápio Online", page_icon="🧁")
+st.set_page_config(
+    page_title="Doce Maju - Bolos & Doces", 
+    page_icon="🧁", 
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
 
-# 2. Estilo Visual "Com Vida" (Rosa, Branco e Marrom)
+# 2. Estilo Visual baseado no seu Logo (Lilás, Rosa e Marrom)
 st.markdown("""
     <style>
-    .stApp { background-color: #fff5f8; }
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
     
-    h1, h2, h3 { color: #5d4037 !important; }
-
-    /* Cartão do Produto */
-    .produto-card {
-        background-color: white;
-        padding: 15px;
-        border-radius: 20px;
-        border-left: 8px solid #ff80ab;
-        box-shadow: 2px 2px 8px rgba(0,0,0,0.05);
-        margin-bottom: 15px;
+    /* Fundo Pérola para destacar o logo */
+    .stApp { background-color: #fdfafb; }
+    
+    /* Cores do Logo */
+    h1 { color: #d4a5b9 !important; font-family: 'Brush Script MT', cursive; font-size: 50px !important; text-align: center; margin-bottom: 0px;}
+    h2, h3 { color: #5d4037 !important; font-family: 'Segoe UI', sans-serif; text-align: center;}
+    
+    .subtitulo {
+        text-align: center;
+        color: #5d4037;
+        font-weight: bold;
+        letter-spacing: 2px;
+        margin-top: -20px;
+        margin-bottom: 20px;
     }
 
-    /* Botão de Adicionar */
+    /* Card de Produto */
+    .produto-card {
+        background-color: white;
+        padding: 20px;
+        border-radius: 20px;
+        border: 2px solid #f3e5f5; /* Lilás bem clarinho como a batedeira */
+        box-shadow: 0px 4px 15px rgba(212, 165, 185, 0.2);
+        margin-bottom: 20px;
+    }
+
+    /* Botão Rosa do Logo */
     .stButton>button {
-        background-color: #ff80ab !important;
+        background-color: #d4a5b9 !important; /* Rosa queimado do logo */
         color: white !important;
-        border-radius: 20px !important;
+        border-radius: 25px !important;
         border: none !important;
+        width: 100%;
         font-weight: bold;
+        height: 45px;
         transition: 0.3s;
     }
     
-    .stButton>button:hover { background-color: #f06292 !important; scale: 1.02; }
-
-    /* Botão do WhatsApp */
-    .stLinkButton>a {
-        background-color: #4caf50 !important;
-        color: white !important;
-        border-radius: 25px !important;
-        text-align: center;
-        font-weight: bold;
-        padding: 12px;
-        display: block;
-        text-decoration: none !important;
+    .stButton>button:hover {
+        background-color: #c48da4 !important;
+        transform: scale(1.02);
     }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Gerenciamento de Estoque (Senha: maju123)
+# 3. Cabeçalho Personalizado (O SEU LOGO)
+col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
+with col_logo2:
+    # Quando você tiver o link da sua foto, troque o link abaixo:
+    st.image("https://cdn-icons-png.flaticon.com/512/9041/9041922.png", width=150) 
+    st.markdown("<h1>Doce Maju</h1>", unsafe_allow_html=True)
+    st.markdown("<p class='subtitulo'>BOLOS & DOCES</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align:center; color:#d4a5b9;'>💕 Feito com amor 💕</p>", unsafe_allow_html=True)
+
+# 4. Dados (Cardápio)
+if 'pedidos_recebidos' not in st.session_state:
+    st.session_state.pedidos_recebidos = []
+
 if 'estoque' not in st.session_state:
     st.session_state.estoque = {
-        "Bombom Uva": True, "Bombom Morango": True,
-        "Bolo Brigadeiro": True, "Bolo Morango": True, "Bolo Chocolate Morango": True
+        "Bombom de Uva": {"preco": 11.0, "status": True, "desc": "Uva com creme de Ninho"},
+        "Bombom de Morango": {"preco": 11.0, "status": True, "desc": "Morango com creme de Ninho"},
+        "Bolo de Brigadeiro": {"preco": 7.5, "status": True, "desc": "Massa fofinha e brigadeiro artesanal"},
+        "Bolo de Morango": {"preco": 7.5, "status": True, "desc": "O clássico com frutas frescas"},
+        "Chocolate com Morango": {"preco": 7.5, "status": True, "desc": "Combinação perfeita"}
     }
 
-with st.sidebar:
-    st.title("🔐 Administração")
-    senha = st.text_input("Senha da Loja:", type="password")
-    if senha == "maju123":
-        st.success("Acesso Liberado")
-        for item in st.session_state.estoque:
-            st.session_state.estoque[item] = st.checkbox(f"{item} em estoque", value=st.session_state.estoque[item])
+# --- ABAS ---
+tab_loja, tab_maju = st.tabs(["🧁 Cardápio", "🔐 Painel Maju"])
 
-# --- CONTEÚDO DO SITE ---
-st.title("🧁 Doce Maju")
-st.subheader("Cardápio de Delícias Artesanais")
-st.write("---")
+with tab_loja:
+    carrinho = {}
+    st.write("---")
+    
+    for nome, dados in st.session_state.estoque.items():
+        st.markdown('<div class="produto-card">', unsafe_allow_html=True)
+        c1, c2 = st.columns([1, 2])
+        with c1:
+            st.image("https://cdn-icons-png.flaticon.com/512/2553/2553642.png", width=80)
+        with c2:
+            st.markdown(f"**{nome}**")
+            st.caption(dados["desc"])
+            st.markdown(f"<span style='color:#d4a5b9; font-weight:bold;'>R$ {dados['preco']:.2f}</span>", unsafe_allow_html=True)
+            
+            if dados["status"]:
+                qtd = st.number_input(f"Qtd", min_value=0, max_value=20, key=f"cli_{nome}")
+                if qtd > 0:
+                    carrinho[nome] = {"qtd": qtd, "subtotal": qtd * dados["preco"]}
+            else:
+                st.error("Esgotado")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-def exibir_item(nome, preco, desc, chave):
-    st.markdown(f'<div class="produto-card">', unsafe_allow_html=True)
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        # Espaço reservado para sua foto real
-        st.image("https://cdn-icons-png.flaticon.com/512/2553/2553642.png", width=90)
-    with col2:
-        st.markdown(f"**{nome}**")
-        st.write(f"R$ {preco}")
-        if st.session_state.estoque[chave]:
-            if st.button(f"Selecionar {nome}", key=chave):
-                st.toast(f"{nome} adicionado!")
+    if carrinho:
+        st.subheader("🛵 Dados para Entrega")
+        nome_cli = st.text_input("Seu Nome")
+        end_cli = st.text_input("Endereço Completo")
+        pag_cli = st.selectbox("Pagamento", ["Pix", "Dinheiro", "Cartão"])
+        
+        total = sum(i['subtotal'] for i in carrinho.values()) + 3.0
+        st.markdown(f"### Total: R$ {total:.2f}")
+        
+        if st.button("CONFIRMAR PEDIDO"):
+            if nome_cli and end_cli:
+                st.session_state.pedidos_recebidos.append({
+                    "id": len(st.session_state.pedidos_recebidos)+1,
+                    "cliente": nome_cli, "end": end_cli, "itens": carrinho.copy(),
+                    "total": total, "pag": pag_cli, "status": "Novo",
+                    "hora": datetime.now().strftime("%H:%M")
+                })
+                st.success("Pedido enviado! Prepare o coração para o doce!")
                 st.balloons()
+
+with tab_maju:
+    senha = st.text_input("Senha", type="password")
+    if senha == "maju123":
+        if not st.session_state.pedidos_recebidos:
+            st.info("Aguardando o primeiro pedido de hoje...")
         else:
-            st.error("Esgotado")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# --- SEÇÃO DE BOMBONS ---
-st.header("🍫 Bombons de Pote (R$ 11,00)")
-exibir_item("Bombom de Uva", "11,00", "Uva com Ninho", "Bombom Uva")
-exibir_item("Bombom de Morango", "11,00", "Morango com Ninho", "Bombom Morango")
-
-st.write("")
-
-# --- SEÇÃO DE BOLOS ---
-st.header("🍰 Bolos no Pote (R$ 7,50)")
-exibir_item("Bolo de Brigadeiro", "7,50", "Chocolate cremoso", "Bolo Brigadeiro")
-exibir_item("Bolo de Brigadeiro com Morango", "7,50", "O clássico com fruta", "Bolo Morango")
-exibir_item("Chocolate com Morango", "7,50", "Sensação irresistível", "Bolo Chocolate Morango")
-
-st.divider()
-st.info("🛵 Taxa de entrega: R$ 3,00")
-
-# --- WHATSAPP ---
-link_zap = "https://wa.me/5521967690731?text=Olá!+Gostaria+de+fazer+um+pedido+da+Doce+Maju."
-st.link_button("🟢 FINALIZAR PEDIDO NO WHATSAPP", link_zap)
+            for p in reversed(st.session_state.pedidos_recebidos):
+                with st.expander(f"Pedido #{p['id']} - {p['cliente']}"):
+                    st.write(f"🏠 {p['end']} | 💰 {p['pag']}")
+                    for item, info in p['itens'].items():
+                        st.write(f"- {info['qtd']}x {item}")
+                    if st.button(f"Entregue #{p['id']}"):
+                        p['status'] = "OK"
+                        st.rerun()
