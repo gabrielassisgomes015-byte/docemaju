@@ -1,135 +1,59 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>PDV Moderno</title>
+import streamlit as st
+
+# 1. Configuração da Página (Título e Layout)
+st.set_page_config(page_title="PDV Moderno", layout="wide")
+
+# 2. Estilo Customizado (Opcional - para botões mais bonitos)
+st.markdown("""
     <style>
-        /* Estilo Geral - Fugindo do "Branco Feioso" */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a1a; /* Fundo escuro elegante */
-            color: #efefef;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-        }
-
-        /* Lado Esquerdo - Cardápio/Produtos */
-        .menu-section {
-            flex: 2;
-            padding: 20px;
-            overflow-y: auto;
-            border-right: 1px solid #333;
-        }
-
-        .grid-produtos {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-        }
-
-        .card-produto {
-            background: #2d2d2d;
-            border-radius: 12px;
-            padding: 10px;
-            text-align: center;
-            transition: transform 0.2s;
-            cursor: pointer;
-            border: 1px solid transparent;
-        }
-
-        .card-produto:hover {
-            transform: translateY(-5px);
-            border-color: #4CAF50;
-        }
-
-        .card-produto img {
-            width: 100%;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 8px;
-            background: #444;
-        }
-
-        /* Lado Direito - Pagamento */
-        .checkout-section {
-            flex: 1;
-            padding: 20px;
-            background-color: #252525;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .titulo { color: #4CAF50; margin-bottom: 20px; }
-
-        .metodos-pagamento {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        /* Botões Limpos e Bonitinhos */
-        .btn-pay {
-            background: #3d3d3d;
-            border: none;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn-pay:hover { background: #555; }
-        .btn-pay.active { background: #4CAF50; } /* Cor de destaque */
-
-        .total-box {
-            margin-top: auto;
-            font-size: 24px;
-            padding: 20px;
-            background: #1a1a1a;
-            border-radius: 10px;
-            text-align: center;
-            border: 1px dashed #4CAF50;
-        }
+    .stButton>button {
+        width: 100%;
+        border-radius: 10px;
+        height: 3em;
+        background-color: #2e7d32;
+        color: white;
+    }
     </style>
-</head>
-<body>
+    """, unsafe_allow_html=True)
 
-    <!-- LADO ESQUERDO: CARDÁPIO -->
-    <section class="menu-section">
-        <h2 class="titulo">Cardápio</h2>
-        <div class="grid-produtos">
-            <!-- Exemplo de Produto -->
-            <div class="card-produto">
-                <img src="https://placeholder.com" alt="Produto">
-                <p>Hambúrguer Art.</p>
-                <strong>R$ 25,00</strong>
-            </div>
-            <!-- Repetir cards aqui -->
-        </div>
-    </section>
+# 3. Divisão da Tela: Coluna Esquerda (Cardápio) e Direita (Checkout)
+col_cardapio, col_checkout = st.columns([2, 1])
 
-    <!-- LADO DIREITO: PAGAMENTO -->
-    <section class="checkout-section">
-        <h2 class="titulo">Finalizar Pedido</h2>
-        
-        <p>Escolha a forma de pagamento:</p>
-        <div class="metodos-pagamento">
-            <button class="btn-pay">💳 Cartão</button>
-            <button class="btn-pay">💵 Dinheiro</button>
-            <button class="btn-pay">📱 PIX</button>
-            <button class="btn-pay">➕ Outros</button>
-        </div>
+with col_cardapio:
+    st.header("🍴 Nosso Cardápio")
+    
+    # Criando uma grade (grid) de produtos
+    p_col1, p_col2 = st.columns(2)
+    
+    with p_col1:
+        st.image("https://placeholder.com", caption="Hambúrguer X-Tudo")
+        st.write("**R$ 25,00**")
+        if st.button("Adicionar", key="btn1"):
+            st.toast("Adicionado ao carrinho!")
 
-        <div class="total-box">
-            <span>Total: </span>
-            <strong>R$ 0,00</strong>
-        </div>
-        
-        <button class="btn-pay active" style="margin-top: 15px; width: 100%;">CONCLUIR VENDA</button>
-    </section>
+    with p_col2:
+        st.image("https://placeholder.com", caption="Batata Especial")
+        st.write("**R$ 18,00**")
+        if st.button("Adicionar", key="btn2"):
+            st.toast("Adicionado ao carrinho!")
 
-</body>
-</html>
+with col_checkout:
+    st.header("💰 Finalizar")
+    st.write("---")
+    
+    st.subheader("Forma de Pagamento")
+    
+    # Botões de pagamento organizados
+    pay_col1, pay_col2 = st.columns(2)
+    with pay_col1:
+        st.button("💳 Cartão")
+        st.button("💵 Dinheiro")
+    with pay_col2:
+        st.button("📱 PIX")
+        st.button("➕ Outro")
+    
+    st.write("---")
+    st.metric(label="Total a Pagar", value="R$ 43,00")
+    
+    if st.button("CONCLUIR VENDA", type="primary"):
+        st.success("Venda realizada com sucesso!")
