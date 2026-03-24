@@ -6,23 +6,21 @@ from datetime import datetime
 # CONFIGURAÇÃO DA PÁGINA
 st.set_page_config(page_title="Doce Maju - Loja", page_icon="🧁", layout="wide")
 
-# --- CONEXÃO COM A PLANILHA (O CÉREBRO DA LOJA) ---
-# Coloque aqui o link que você pegou na barra de endereços da planilha
+# --- CONEXÃO COM A PLANILHA ---
+# Coloque seu link aqui embaixo
 URL_PLANILHA = "https://docs.google.com/spreadsheets/d/17OOn8U96k3eDg_PeN0QMlIzzfCiftx6kheqqLcnD97c/edit?gid=0#gid=0"
 
 def carregar_estoque():
     try:
-        # Converte o link da planilha para formato de leitura automática (CSV)
         url_csv = URL_PLANILHA.replace('/edit?usp=sharing', '/export?format=csv').replace('/edit', '/export?format=csv')
         df = pd.read_csv(url_csv)
         return df
     except:
-        st.error("Erro ao carregar os doces. Verifique o link da planilha!")
         return pd.DataFrame()
 
 df_estoque = carregar_estoque()
 
-# ESTILO PARA FICAR BONITO
+# ESTILO
 st.markdown("""
     <style>
         [data-testid="stSidebarNav"] {display: none;}
@@ -31,10 +29,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Link das fotos no seu GitHub
 LINK_FOTOS = "https://raw.githubusercontent.com/gabrielassisgomes015-byte/docemaju/main/"
 
-# --- INTERFACE DA LOJA ---
 st.title("🧁 Doce Maju")
 st.write("### Feito com amor para adoçar seu dia!")
 
@@ -45,14 +41,14 @@ if not df_estoque.empty:
         itens_selecionados = {}
         c1, c2 = st.columns(2)
         
-        # Filtra apenas o que sua irmã marcou como disponível (Sim)
+        # Filtrar disponíveis
         produtos_ativos = df_estoque[df_estoque['Disponível'].astype(str).str.upper() == 'SIM']
         
         for i, (index, row) in enumerate(produtos_ativos.iterrows()):
             target_col = c1 if i % 2 == 0 else c2
             with target_col:
+                # O ERRO ESTAVA AQUI: As linhas abaixo precisam desses espaços na frente
                 with st.container(border=True):
-                    # Puxa a imagem usando o nome que está na planilha
                     st.image(LINK_FOTOS + str(row['Imagem']), use_container_width=True)
                     st.subheader(row['Produto'])
                     st.write(f"R$ {row['Preço']:.2f}")
@@ -67,3 +63,35 @@ if not df_estoque.empty:
 
     with col_carrinho:
         with st.container(border=True):
+            st.header("🛒 Seu Pedido")
+            if not itens_selecionados:
+                st.write("Seu carrinho está vazio.")
+            else:
+                total_itens = 0
+                resumo_whatsapp = ""
+                for nome, info in itens_selecionados.items():
+                    st.write(f"{info['qtd']}x {nome}")
+                    total_itens += info['subtotal']
+                    resumo_whatsapp += f"{info['qtd']}x {nome}; "
+                
+                st.divider()
+                envio = st.selectbox("Entrega", ["Retirada (Grátis)", "Entrega (+ R$ 3,00)"])
+                taxa = 3.0 if "Entrega" in envio else 0.0
+                total_final = total_itens + taxa
+                
+                endereco = st.text_input("Endereço completo:") if taxa > 0 else "Retirada"
+                pagamento = st.selectbox("Pagamento", ["Pix", "Cartão", "Dinheiro"])
+                nome_cli = st.text_input("Seu Nome:")
+                
+                st.subheader(f"Total: R$ {total_final:.2f}")
+
+                if st.button("🚀 FINALIZAR PEDIDO"):
+                    if nome_cli:
+                        msg = f"*NOVO PEDIDO*\n*Cliente:* {nome_cli}\n*Itens:* {resumo_whatsapp}\n*Total:* R$ {total_final:.2f}"
+                        link_wa = f"https://wa.me/5521999999999?text={urllib.parse.quote(msg)}"
+                        st.link_button("ENVIAR NO WHATSAPP", link_wa)
+                        st.balloons()
+                    else:
+                        st.error("Digite seu nome!")
+else:
+    st.error("Coloque o link da planilha no código para os produtos aparecerem!")
