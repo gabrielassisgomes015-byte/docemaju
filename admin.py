@@ -19,7 +19,7 @@ if not st.session_state.autenticado:
 else:
     # --- CONEXÃO COM A PLANILHA ---
     # Substitua o link abaixo pelo link da sua planilha do Google (com permissão de edição)
-    url = "COLE_AQUI_O_LINK_DA_SUA_PLANILHA_GOOGLE"
+    url = "https://docs.google.com/spreadsheets/d/17OOn8U96k3eDg_PeN0QMlIzzfCiftx6kheqqLcnD97c/edit?gid=0#gid=0"
     conn = st.connection("gsheets", type=GSheetsConnection)
     
     df = conn.read(spreadsheet=url)
