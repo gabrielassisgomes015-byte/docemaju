@@ -70,7 +70,7 @@ st.markdown("<p style='text-align: center; color: #5d4037; font-weight: bold;'>�
 doces = [
     {"nome": "Bombom Uva com ninho", "preco": 11.0, "desc": "Uvas frescas colhidas com creme de leite Ninho", "foto": "https://via.placeholder.com/150/ffffff/e63946?text=Uva+Ninho"},
     {"nome": "Bombom Morango com ninho", "preco": 11.0, "desc": "Morango suculento com o verdadeiro Ninho", "foto": "https://via.placeholder.com/150/ffffff/e63946?text=Morango+Ninho"},
-    {"nome": "Bolo de Pote brigadeiro com morango e brigadeiro", "preco": 8.0, "desc": "Explosão de chocolate com pedaços de fruta", "foto": "https://via.placeholder.com/150/ffffff/e63946?text=Bolo+Brigadeiro"}
+    {"nome": "Bolo de Pote brigadeiro com morango", "preco": 7.50, "desc": "Explosão de chocolate com pedaços de fruta", "foto": "https://via.placeholder.com/150/ffffff/e63946?text=Bolo+Brigadeiro"}
 ]
 
 # --- LAYOUT ---
