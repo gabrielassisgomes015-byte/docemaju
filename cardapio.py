@@ -5,7 +5,7 @@ import urllib.parse # Serve para preparar o texto para o WhatsApp
 st.set_page_config(page_title="Doce Maju", page_icon="🧁", layout="wide")
 
 # --- COLOQUE O NÚMERO DA SUA IRMÃ AQUI (Com DDD e sem espaços) ---
-NUMERO_WHATSAPP = "5521999999999" 
+NUMERO_WHATSAPP = "5521967690731" 
 
 # Inicializando o estoque
 if 'estoque' not in st.session_state:
