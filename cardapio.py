@@ -14,19 +14,19 @@ if 'estoque' not in st.session_state:
             "preco": 11.0, 
             "desc": "Uvas frescas e creme Ninho", 
             "disponivel": True, 
-            "imagem": "g.jpeg"
+            "imagem": "uva.png"
         },
         "Bombom Morango com ninho": {
             "preco": 11.0, 
             "desc": "Morango e o verdadeiro Ninho", 
             "disponivel": True, 
-            "imagem": "p.jpeg"
+            "imagem": "morango.png"
         },
         "Bolo de Pote brigadeiro": {
             "preco": 8.0, 
             "desc": "Chocolate com morango", 
             "disponivel": True, 
-            "imagem": "rango.png.jpeg"
+            "imagem": "chocolate.morango.png"
         }
     }
 
