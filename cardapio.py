@@ -2,41 +2,48 @@ import streamlit as st
 import pandas as pd
 import urllib.parse
 
-# CONFIGURAÇÃO DA LOJA
-st.set_page_config(page_title="Doce Maju - Loja", page_icon="🧁")
+# CONFIGURAÇÃO DA PÁGINA
+st.set_page_config(page_title="Doce Maju - Cardápio", page_icon="🧁")
 
-# LINK CORRIGIDO (O segredo está no final do link: /pub?output=csv)
-# Use este link que gerei abaixo, ele é feito para sites lerem sem erro
-URL_DOCS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS_0hZ4p7C6XvKx4N_Zf6H-8yRz5zX5m3v7-X5zX5m3v7-X5zX5m3v7-X5zX5m3v7/pub?output=csv"
-
-# Se o link acima for muito diferente do seu, vamos usar o formato padrão:
-URL_DIRETA = "https://docs.google.com/spreadsheets/d/1700n8U96k3eDg_PeN8QM1IzzfCiftx6kheqqLcnD97c/gviz/tq?tqx=out:csv"
+# LINK DA PLANILHA
+URL = "https://docs.google.com/spreadsheets/d/1700n8U96k3eDg_PeN8QM1IzzfCiftx6kheqqLcnD97c/gviz/tq?tqx=out:csv"
 
 st.title("🧁 Doce Maju")
+st.write("---")
 
 try:
-    # Tentando ler a planilha de um jeito mais forte
-    df = pd.read_csv(URL_DIRETA)
+    # Lendo a planilha
+    df = pd.read_csv(URL)
     
-    if not df.empty:
-        c1, c2 = st.columns(2)
-        for i, row in df.iterrows():
-            # Verifica se a coluna 'Disponível' existe e se é 'Sim'
-            if str(row['Disponível']).strip().lower() == 'sim':
-                col = c1 if i % 2 == 0 else c2
-                with col:
-                    with st.container(border=True):
-                        foto = f"https://raw.githubusercontent.com/gabrielassisgomes015-byte/docemaju/main/{row['Imagem']}"
-                        st.image(foto, use_container_width=True)
-                        st.subheader(row['Produto'])
-                        st.write(f"R$ {row['Preço']:.2f}")
-                        
-                        # Botão do WhatsApp
-                        msg = f"Olá Maju! Quero o doce: {row['Produto']}"
-                        link_wa = f"https://wa.me/5521999999999?text={urllib.parse.quote(msg)}"
-                        st.link_button("Pedir no WhatsApp", link_wa)
+    # Limpando espaços extras nos nomes das colunas
+    df.columns = [c.strip().lower() for c in df.columns]
+
+    if df.empty:
+        st.warning("Cadastre os doces na planilha para eles aparecerem aqui!")
     else:
-        st.warning("A planilha parece estar vazia.")
+        col1, col2 = st.columns(2)
+        
+        for i, row in df.iterrows():
+            # Verifica se o doce está disponível (procura por 'sim')
+            # Usei .get() para evitar erro caso a coluna tenha acento ou não
+            disponibilidade = str(row.get('disponível', row.get('disponivel', ''))).strip().lower()
+            
+            if disponibilidade == 'sim':
+                target_col = col1 if i % 2 == 0 else col2
+                with target_col:
+                    with st.container(border=True):
+                        # Puxa a foto do GitHub
+                        nome_foto = str(row['imagem']).strip()
+                        link_foto = f"https://raw.githubusercontent.com/gabrielassisgomes015-byte/docemaju/main/{nome_foto}"
+                        
+                        st.image(link_foto, use_container_width=True)
+                        st.subheader(row['produto'])
+                        st.write(f"R$ {row['preço']}")
+                        
+                        # Botão de Pedido
+                        texto_pedido = f"Olá Maju! Quero o doce: {row['produto']}"
+                        link_wa = f"https://wa.me/5521999999999?text={urllib.parse.quote(texto_pedido)}"
+                        st.link_button("Pedir no WhatsApp", link_wa)
 
 except Exception as e:
-    st.error("Quase lá! Verifique se na sua planilha a primeira linha tem os nomes: Produto, Preço, Disponível, Imagem")
+    st.error("Erro de conexão. Verifique se a planilha está 'Publicada na Web'!")
