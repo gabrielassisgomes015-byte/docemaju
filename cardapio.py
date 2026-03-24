@@ -12,7 +12,7 @@ if 'estoque' not in st.session_state:
     st.session_state.estoque = {
         "Bombom Uva com ninho": {"preco": 11.0, "desc": "Uvas frescas e creme Ninho", "disponivel": True},
         "Bombom Morango com ninho": {"preco": 11.0, "desc": "Morango e o verdadeiro Ninho", "disponivel": True},
-        "Bolo de Pote brigadeiro": {"preco": 8.0, "desc": "Chocolate com morango", "disponivel": True}
+        "Bolo de Pote brigadeiro": {"preco": 7.50, "desc": "Chocolate com morango", "disponivel": True}
     }
 
 # NAVEGAÇÃO
