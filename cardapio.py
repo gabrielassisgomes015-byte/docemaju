@@ -6,7 +6,7 @@ import urllib.parse
 st.set_page_config(page_title="Doce Maju - Cardápio", page_icon="🧁")
 
 # LINK DA PLANILHA
-URL = "https://docs.google.com/spreadsheets/d/1700n8U96k3eDg_PeN8QM1IzzfCiftx6kheqqLcnD97c/gviz/tq?tqx=out:csv"
+URL = "https://docs.google.com/spreadsheets/d/17OOn8U96k3eDg_PeN0QMlIzzfCiftx6kheqqLcnD97c/edit?usp=sharing"
 
 st.title("🧁 Doce Maju")
 st.write("---")
