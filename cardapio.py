@@ -57,7 +57,7 @@ for i, doce in enumerate(doces):
             # Botão de Pedido personalizado
             texto_pedido = f"Olá Maju! Quero o doce: {doce['nome']}"
             # Troque os NOVE ZEROS pelo número real da Maju (Ex: 21988887777)
-            link_wa = f"https://wa.me/5521999999999?text={urllib.parse.quote(texto_pedido)}"
+            link_wa = f"https://wa.me/+55 21 96769-0731?text={urllib.parse.quote(texto_pedido)}"
             
             st.link_button("Pedir no WhatsApp 💬", link_wa, use_container_width=True)
 
