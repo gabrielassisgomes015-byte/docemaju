@@ -1,49 +1,65 @@
 import streamlit as st
-import pandas as pd
 import urllib.parse
 
 # CONFIGURAÇÃO DA PÁGINA
 st.set_page_config(page_title="Doce Maju - Cardápio", page_icon="🧁")
 
-# LINK DA PLANILHA
-URL = "https://docs.google.com/spreadsheets/d/17OOn8U96k3eDg_PeN0QMlIzzfCiftx6kheqqLcnD97c/edit?usp=sharing"
+# CSS para centralizar as imagens e deixar o layout bonito
+st.markdown("""
+    <style>
+    [data-testid="stImage"] {
+        display: flex;
+        justify-content: center;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 st.title("🧁 Doce Maju")
 st.write("---")
 
-try:
-    # Lendo a planilha
-    df = pd.read_csv(URL)
+# LISTA DE DOCES (Edite os nomes e preços aqui)
+# IMPORTANTE: O nome em 'imagem' deve ser IGUAL ao arquivo no seu GitHub
+doces = [
+    {
+        "nome": "Bombom de Uva",
+        "preco": "11,00",
+        "imagem": "uva.png"
+    },
+    {
+        "nome": "Bombom de Morango",
+        "preco": "11,00",
+        "imagem": "morango.png"
+    },
+    {
+        "nome": "Bolo de Pote de Brigadeiro",
+        "preco": "7,50",
+        "imagem": "brigadeiro.png.jpeg"
+    }
+]
+
+# EXIBIÇÃO EM COLUNAS
+col1, col2 = st.columns(2)
+
+for i, doce in enumerate(doces):
+    target_col = col1 if i % 2 == 0 else col2
     
-    # Limpando espaços extras nos nomes das colunas
-    df.columns = [c.strip().lower() for c in df.columns]
-
-    if df.empty:
-        st.warning("Cadastre os doces na planilha para eles aparecerem aqui!")
-    else:
-        col1, col2 = st.columns(2)
-        
-        for i, row in df.iterrows():
-            # Verifica se o doce está disponível (procura por 'sim')
-            # Usei .get() para evitar erro caso a coluna tenha acento ou não
-            disponibilidade = str(row.get('disponível', row.get('disponivel', ''))).strip().lower()
+    with target_col:
+        with st.container(border=True):
+            # Link direto para a imagem no seu GitHub
+            link_foto = f"https://raw.githubusercontent.com/gabrielassisgomes015-byte/docemaju/main/{doce['imagem']}"
             
-            if disponibilidade == 'sim':
-                target_col = col1 if i % 2 == 0 else col2
-                with target_col:
-                    with st.container(border=True):
-                        # Puxa a foto do GitHub
-                        nome_foto = str(row['imagem']).strip()
-                        link_foto = f"https://raw.githubusercontent.com/gabrielassisgomes015-byte/docemaju/main/{nome_foto}"
-                        
-                        st.image(link_foto, use_container_width=True)
-                        st.subheader(row['produto'])
-                        st.write(f"R$ {row['preço']}")
-                        
-                        # Botão de Pedido
-                        texto_pedido = f"Olá Maju! Quero o doce: {row['produto']}"
-                        link_wa = f"https://wa.me/5521999999999?text={urllib.parse.quote(texto_pedido)}"
-                        st.link_button("Pedir no WhatsApp", link_wa)
+            # Mostra a imagem com tamanho fixo de 250 pixels
+            st.image(link_foto, width=250)
+            
+            st.subheader(doce['nome'])
+            st.write(f"### R$ {doce['preco']}")
+            
+            # Botão de Pedido personalizado
+            texto_pedido = f"Olá Maju! Quero o doce: {doce['nome']}"
+            # Troque os NOVE ZEROS pelo número real da Maju (Ex: 21988887777)
+            link_wa = f"https://wa.me/5521999999999?text={urllib.parse.quote(texto_pedido)}"
+            
+            st.link_button("Pedir no WhatsApp 💬", link_wa, use_container_width=True)
 
-except Exception as e:
-    st.error("Erro de conexão. Verifique se a planilha está 'Publicada na Web'!")
+st.write("---")
+st.caption("Doce Maju © 2024 - Feito com ❤️")
