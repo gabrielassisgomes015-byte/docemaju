@@ -1,81 +1,93 @@
 import streamlit as st
 import urllib.parse
 
-# CONFIGURAÇÃO DA PÁGINA
-st.set_page_config(page_title="Doce Maju - Loja", page_icon="🧁", layout="wide")
+# 1. CONFIGURAÇÃO DA PÁGINA (Aqui você muda o ícone da aba do navegador)
+# No 'page_icon', você pode colocar um link de uma foto ou um emoji
+st.set_page_config(
+    page_title="Doce Maju - Cardápio", 
+    page_icon="🧁", 
+    layout="wide" # Isso faz o site usar a tela toda, espalhando mais os itens
+)
 
-# --- INICIALIZAÇÃO DO CARRINHO (A MEMÓRIA DO SITE) ---
-if 'carrinho' not in st.session_state:
-    st.session_state.carrinho = []
+# CSS para ajustar o visual e diminuir espaços
+st.markdown("""
+    <style>
+    .stButton button {
+        width: 100%;
+        border-radius: 20px;
+    }
+    [data-testid="stImage"] {
+        display: flex;
+        justify-content: center;
+    }
+    /* Estilo para as características */
+    .descricao {
+        font-size: 14px;
+        color: #666;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-# --- FUNÇÕES DO CARRINHO ---
-def adicionar_ao_carrinho(nome, preco):
-    st.session_state.carrinho.append({"nome": nome, "preco": preco})
-    st.toast(f"✅ {nome} adicionado!")
+# 2. CABEÇALHO COM LOGO (Opcional)
+# Se tiver um link de logo, substitua o link abaixo. 
+# Se não tiver, ele vai mostrar apenas o texto.
+col_logo1, col_logo2 = st.columns([1, 4])
+with col_logo1:
+    # Substitua esse link pela URL da sua logo no GitHub se quiser
+    st.image("https://raw.githubusercontent.com/gabrielassisgomes015-byte/docemaju/main/logo.png.jpeg", width=100)
+with col_logo2:
+    st.title("Doce Maju - Cardápio")
 
-def limpar_carrinho():
-    st.session_state.carrinho = []
-
-# --- INTERFACE: BARRA LATERAL (CARRINHO) ---
-with st.sidebar:
-    st.header("🛒 Seu Carrinho")
-    if not st.session_state.carrinho:
-        st.write("O carrinho está vazio.")
-    else:
-        total = 0
-        resumo_pedido = "Olá Maju! Gostaria de fazer o seguinte pedido:\n\n"
-        
-        for item in st.session_state.carrinho:
-            st.write(f"• {item['nome']} - R$ {item['preco']}")
-            # Convertendo preço para somar (troca vírgula por ponto)
-            total += float(item['preco'].replace(',', '.'))
-            resumo_pedido += f"- {item['nome']} (R$ {item['preco']})\n"
-        
-        st.write("---")
-        st.subheader(f"Total: R$ {total:.2f}".replace('.', ','))
-        
-        # Botão para Finalizar e ir para o WhatsApp
-        resumo_pedido += f"\n*Total: R$ {total:.2f}*"
-        numero_maju = "5521967690731" # <--- COLOQUE O NÚMERO DA SUA IRMÃ AQUI
-        link_wa = f"https://wa.me/{numero_maju}?text={urllib.parse.quote(resumo_pedido)}"
-        
-        st.link_button("Finalizar Pedido (WhatsApp) ✅", link_wa, use_container_width=True)
-        
-        if st.button("Esvaziar Carrinho 🗑️"):
-            limpar_carrinho()
-            st.rerun()
-
-# --- INTERFACE: CORPO DA LOJA ---
-st.title("🧁 Doce Maju - Cardápio")
-st.write("Escolha seus doces e clique em adicionar!")
 st.write("---")
 
-# LISTA DE DOCES
+# 3. LISTA DE DOCES (Com campo para Características)
 doces = [
-    {"nome": "Bombom de Uva", "preco": "11,00", "imagem": "uva.png"},
-    {"nome": "Bombom de Morango", "preco": "11,00", "imagem": "morango.png"},
-    {"nome": "Bolo de Pote de Brigadeiro", "preco": "7,50", "imagem": "brigadeiro.png.jpeg"}
+    {
+        "nome": "Bombom de Uva",
+        "preco": "11,00",
+        "imagem": "uva.png",
+        "descricao": "Uva fresca coberta com brigadeiro branco e chocolate."
+    },
+    {
+        "nome": "Bombom de Morango",
+        "preco": "11,00",
+        "imagem": "morango.png",
+        "descricao": "Morango selecionado com camada generosa de chocolate."
+    },
+    {
+        "nome": "Bolo de Pote",
+        "preco": "7,50",
+        "imagem": "brigadeiro.png.jpeg",
+        "descricao": "Massa fofinha com recheio cremoso de brigadeiro gourmet."
+    }
 ]
 
-col1, col2 = st.columns(2)
+# 4. EXIBIÇÃO EM COLUNAS (Lado a lado e menores)
+# Criamos várias colunas para os doces não ficarem gigantes
+cols = st.columns(3) # Aumentei para 3 colunas para ficarem menores ainda
 
 for i, doce in enumerate(doces):
-    target_col = col1 if i % 2 == 0 else col2
-    
-    with target_col:
+    # Distribui os doces entre as 3 colunas
+    with cols[i % 3]:
         with st.container(border=True):
             link_foto = f"https://raw.githubusercontent.com/gabrielassisgomes015-byte/docemaju/main/{doce['imagem']}"
             
-            st.image(link_foto, width=250)
+            # IMAGEM PEQUENA (180px)
+            st.image(link_foto, width=180)
+            
             st.subheader(doce['nome'])
+            
+            # CARACTERÍSTICAS (O que você pediu para adicionar depois)
+            st.markdown(f"<p class='descricao'>{doce['descricao']}</p>", unsafe_allow_html=True)
+            
             st.write(f"**R$ {doce['preco']}**")
             
-            # Botão que adiciona ao carrinho em vez de abrir link
-            st.button(f"Adicionar {doce['nome']}", 
-                      key=f"btn_{i}", 
-                      on_click=adicionar_ao_carrinho, 
-                      args=(doce['nome'], doce['preco']),
-                      use_container_width=True)
+            # Botão de Pedido
+            texto_pedido = f"Olá Maju! Quero o doce: {doce['nome']}"
+            link_wa = f"https://wa.me/5521999999999?text={urllib.parse.quote(texto_pedido)}"
+            st.link_button("Pedir", link_wa)
 
 st.write("---")
-st.caption("Dica: O carrinho aparece na lateral (ou no topo no celular).")
+st.caption("Doce Maju - Qualidade e Sabor")
