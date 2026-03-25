@@ -36,7 +36,7 @@ with st.sidebar:
         
         # Botão para Finalizar e ir para o WhatsApp
         resumo_pedido += f"\n*Total: R$ {total:.2f}*"
-        numero_maju = "5521999999999" # <--- COLOQUE O NÚMERO DA SUA IRMÃ AQUI
+        numero_maju = "5521967690731" # <--- COLOQUE O NÚMERO DA SUA IRMÃ AQUI
         link_wa = f"https://wa.me/{numero_maju}?text={urllib.parse.quote(resumo_pedido)}"
         
         st.link_button("Finalizar Pedido (WhatsApp) ✅", link_wa, use_container_width=True)
