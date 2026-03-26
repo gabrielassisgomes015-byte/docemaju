@@ -92,7 +92,7 @@ if st.session_state.carrinho:
 
     # Botão WhatsApp
     msg = f"PEDIDO DOCE MAJU:\n{resumo_itens}------------------\nSubtotal: R$ {total_doces:.2f}\nEntrega: R$ {taxa_entrega:.2f}\nTOTAL: R$ {total_final:.2f}\nPagamento: {pagamento}\n{entrega}"
-    link_wa = f"https://wa.me/5521967690731?text={urllib.parse.quote(msg)}"
+    link_wa = f"https://wa.me/5521999999999?text={urllib.parse.quote(msg)}"
     
     st.link_button("✅ FINALIZAR PEDIDO NO WHATSAPP", link_wa, use_container_width=True)
 
